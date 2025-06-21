@@ -4,9 +4,13 @@ import ch.qos.logback.classic.Logger;
 import com.branchcourse.courses.entity.CourseEntry;
 import com.branchcourse.courses.services.CourseEntryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -33,7 +37,20 @@ public class CoursesEntryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCourseEntryById(@PathVariable String id) {
+    public ResponseEntity<?> deleteCourseEntryById(@PathVariable String id) {
+        // First check if the course is a prerequisite for any other courses
+        if (courseEntryService.isPrerequisite(id)) {
+            // Get the list of courses that depend on this one
+            List<String> dependentCourses = courseEntryService.getCoursesUsingAsPrerequisite(id);
+
+            // Return 409 Conflict with error details
+            Map<String, Object> response = new HashMap<>();
+            response.put("error", "Cannot delete course - it is a prerequisite for other courses");
+            response.put("dependentCourses", dependentCourses);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        }
+
+        // If not a prerequisite, proceed with deletion
         courseEntryService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

@@ -51,6 +51,19 @@ public class CourseEntryService {
         return Optional.of(courseEntryRepository.findById(id));
     }
 
+    public boolean isPrerequisite(String courseId) {
+        // Check if any course has this course as a prerequisite
+        return courseEntryRepository.existsByPrerequisitesId(courseId);
+    }
+
+    public List<String> getCoursesUsingAsPrerequisite(String prerequisiteId) {
+        // Return list of course IDs that use this course as prerequisite
+        return courseEntryRepository.findByPrerequisitesId(prerequisiteId)
+                .stream()
+                .map(CourseEntry::getId)
+                .collect(Collectors.toList());
+    }
+
     public void deleteById(String id) {
         // Check if course is a prerequisite for others
         List<CourseEntry> dependentCourses = courseEntryRepository.findByPrerequisitesId(id);

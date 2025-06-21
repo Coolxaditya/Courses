@@ -14,4 +14,6 @@ public interface CourseEntryRepository extends MongoRepository<CourseEntry,Strin
     // Custom query to find courses that have the given course as a prerequisite
     @Query(value = "{'prerequisites.$id': ?0}")
     List<CourseEntry> findByPrerequisitesId(String courseId);
+
+    boolean existsByPrerequisitesId(String courseId);
 }
