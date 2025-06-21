@@ -1,5 +1,6 @@
 package com.branchcourse.courses.controller;
 
+import ch.qos.logback.classic.Logger;
 import com.branchcourse.courses.entity.CourseEntry;
 import com.branchcourse.courses.services.CourseEntryService;
 import org.springframework.beans.factory.annotation.Autowired;
